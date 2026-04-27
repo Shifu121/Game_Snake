@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onkeydown="Update_keydowns()">
+    <div id="main">
+
+    </div>
+</body>
+<style>
+    #main{
+        margin: auto;
+        
+        height: 90vh;
+        width: 90vh;
+
+        display: grid;
+        grid-template-columns: repeat(20, 4vh);
+        grid-template-rows: repeat(20, 4vh);
+        gap: 0.5vh;
+        padding-left: 0.5vh;
+        padding-top: 0.5vh;
+
+        border-radius: 10px;
+        background-color: blanchedalmond;
+    }
+
+    .block{
+        width: 4vh;
+        height: 4vh;
+
+        background-color: gainsboro;
+    }
+</style>
+<script>
+    let rows = 20;
+    let columns = 20;
+
+    let s = "";
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+            s += "<div class=\"block\" id=\"" + i + "_" + j + "\"></div>";
+        }
+    }
+    document.getElementById("main").innerHTML = s;
+
+    let starting_cell = [10, 10];
+    let body = [starting_cell];
+    let size = 4;
+
+
+    let keys = {};
+    let A_ASCII = "A".charCodeAt(0);
+    let Z_ASCII = "Z".charCodeAt(0);
+    for (let ascii_code = A_ASCII; ascii_code < Z_ASCII+1; ascii_code++) {
+        let char = String.fromCharCode(ascii_code);
+        keys[char] = false;
+    }
+
+    function Update_keydowns() {
+        for (let ascii_code = A_ASCII; ascii_code < Z_ASCII+1; ascii_code++) {
+            let char = String.fromCharCode(ascii_code);
+            keys[char] = false;
+        }
+        for (let ascii_code = A_ASCII; ascii_code < Z_ASCII+1; ascii_code++) {
+            let char = String.fromCharCode(ascii_code);
+            if (event.code == ("Key" + char)) {
+                keys[char] = true;
+            }
+        }
+    }
+    
+    let points = 0;
+    let next_step = 0;
+    let apple = [Math.floor(Math.random()*rows), Math.floor(Math.random()*columns)];
+    id = setInterval(() => {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                document.getElementById(i + "_" + j).style.backgroundColor = "gainsboro";
+            }
+        }
+    
+        if ((keys.D && next_step != 2) || next_step == 0) {
+            next_step = 0;
+            body.push([body[body.length - 1][0], body[body.length - 1][1] + 1]);
+        }
+        if ((keys.W && next_step != 3) || next_step == 1) {
+            next_step = 1;
+            body.push([body[body.length - 1][0] - 1, body[body.length - 1][1]]);
+        }
+        if ((keys.A && next_step != 0) || next_step == 2) {
+            next_step = 2;
+            body.push([body[body.length - 1][0], body[body.length - 1][1] - 1]);
+        }
+        if ((keys.S && next_step != 1) || next_step == 3) {
+            next_step = 3;
+            body.push([body[body.length - 1][0] + 1, body[body.length - 1][1]]);
+        }
+        if (body.length > size) {
+            for (let i = 0; i < body.length - 1; i++) {
+                body[i] = body[i+1];
+            }
+            while (body.length > size) {
+                body.pop();
+            }
+        }
+
+        
+        document.getElementById(apple[0] + "_" + apple[1]).style.backgroundColor = "red";
+        
+        for (let i = 0; i < body.length; i++) {
+            if (apple[0] == body[i][0] && apple[1] == body[i][1]) {
+                points++;
+                size++;
+                apple = [Math.floor(Math.random()*rows), Math.floor(Math.random()*columns)];
+            };
+        }
+
+        try{
+            for (let i = 0; i < body.length; i++) {
+                document.getElementById(body[i][0] + "_" + body[i][1]).style.backgroundColor = "green";
+            }
+        }
+        catch{
+            alert("Vesztettél!");
+            clearInterval(id);
+        }
+
+        if (points == 10) {
+            alert("Nyertél! Pontjaid: " + points);
+        }
+
+    }, 250)
+</script>
+</html>
